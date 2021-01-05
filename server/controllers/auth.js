@@ -15,7 +15,10 @@ async function registerUser(req, res) {
     });
 
     //generate jwt with new user id
-    const token = jwtGenerator({ user_id: newUser.id }, '1h');
+    const token = jwtGenerator({ user_id: newUser.id }, '15m');
+    res.cookie('token', jwtGenerator({ user_id: newUser.id }, '20m'), {
+      httpOnly: true,
+    });
     res.status(201).json({ token });
   } catch (err) {
     res.status(500).send(err.message);
@@ -46,6 +49,9 @@ async function loginUser(req, res) {
     const token = jwtGenerator({ user_id: user.id }, '1h');
 
     //send back token
+    res.cookie('token', jwtGenerator({ user_id: newUser.id }, '20m'), {
+      httpOnly: true,
+    });
     res.send({ token });
   } catch (err) {
     res.status(500).send(err.message);
@@ -60,8 +66,21 @@ const isAuthenticated = (req, res) => {
   res.send({ authenticated: true });
 };
 
+const refreshToken = (req, res) => {
+  if (!req.user) {
+    return res.send('Unauthorized');
+  }
+
+  const token = jwtGenerator({ user_id: req.user.user_id }, '15m');
+  res.cookie('token', jwtGenerator({ user_id: req.user.user_id }, '20m'), {
+    httpOnly: true,
+  });
+  res.send({ token });
+};
+
 module.exports = {
   registerUser,
   loginUser,
   isAuthenticated,
+  refreshToken,
 };

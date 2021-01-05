@@ -5,8 +5,10 @@ const {
   registerUser,
   loginUser,
   isAuthenticated,
+  refreshToken,
 } = require('../controllers/auth');
 const authorization = require('../middlewares/authorization');
+const refreshTokenMiddleware = require('../middlewares/refreshToken');
 
 //TODO: Send back a longer expiration jwt in cookie and implement refresh token logic.
 
@@ -48,6 +50,6 @@ router.get('/is-authenticated', authorization, isAuthenticated);
  * @param {callback} - Refresh Token Middleware
  * @param {callback}
  */
-// router.get('/refresh-token', refresh_token, refreshToken);
+router.get('/refresh-token', refreshTokenMiddleware, refreshToken);
 
 module.exports = router;
